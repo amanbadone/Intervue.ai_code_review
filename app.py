@@ -11,6 +11,7 @@ model = genai.GenerativeModel('gemini-pro')
 
 interview_started = False  # Flag to indicate if the interview has started
 questions = []  # List to store questions
+current_question = None  # Variable to track the current question
 
 @app.route('/')
 def index():
@@ -49,9 +50,25 @@ def parse_resume():
         # Handle errors during resume parsing or question generation
         return jsonify({'error': str(e)}), 500
 
+@app.route('/process_response', methods=['POST'])
+def process_response():
+    global current_question
+    response_data = request.json
+    user_response = response_data.get('response', '')
+
+    # Here, you need to implement logic to handle the user's response and determine the next question
+    # Example logic:
+    if current_question == "Tell me about your experience as an Android Developer Intern at Infobyte.":
+        # Logic to handle the response for this specific question
+        # You can update the current_question variable to ask a follow-up question
+        current_question = "Describe your role as Club Head of the MLSA Club."
+
+    # Return the next question or None if the interview is completed
+    return jsonify({'question': current_question})
+
 @app.route('/start_interview', methods=['POST'])
 def start_interview():
-    global interview_started, questions
+    global interview_started, questions, current_question
     if not interview_started:
         return jsonify({'error': 'Interview not started yet'}), 400
 
