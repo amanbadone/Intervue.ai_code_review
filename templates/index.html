@@ -108,7 +108,12 @@
         document.getElementById('resumeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData();
-            formData.append('resume', document.getElementById('resume').files[0]);
+            const resumeInput = document.getElementById('resume');
+            if (!resumeInput.files[0]) {
+                console.error('No file selected');
+                return;
+            }
+            formData.append('resume', resumeInput.files[0]);
             
             try {
                 const response = await fetch('/parse_resume', {
@@ -127,12 +132,15 @@
                 console.error('Error:', error);
             }
         });
-
+    
         async function submitUserResponse(response) {
             const responseDiv = document.createElement('div');
             responseDiv.innerHTML = `<p><strong>Your Response:</strong> ${response}</p>`;
             document.getElementById('questionArea').appendChild(responseDiv);
-
+        
+            // Prepare response object in JSON format
+            const responseDataObj = { response: response };
+        
             // Send user response to backend for processing
             try {
                 const backendResponse = await fetch('/process_response', {
@@ -140,7 +148,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ response })
+                    body: JSON.stringify(responseDataObj) // Use a different variable name to avoid conflict
                 });
                 const responseData = await backendResponse.json();
                 console.log('Backend response data:', responseData);
@@ -153,44 +161,53 @@
             } catch (error) {
                 console.error('Error:', error);
             }
-        }
-
+        }                
+        
         function displayQuestion(question) {
             const questionArea = document.getElementById('questionArea');
             const questionHTML = `<p><strong>Question:</strong> ${question}</p>`;
             questionArea.innerHTML += questionHTML; // Append the new question HTML
             speakText(`Question: ${question}`); // Speak the question
         }
-
+    
         // Function to start speech recognition
         function startSpeechRecognition() {
-            const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.onresult = async function(event) {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('userResponse').value = transcript;
-                submitUserResponse(transcript);
-            };
-            recognition.start();
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.onresult = async function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('userResponse').value = transcript;
+                    submitUserResponse(transcript);
+                };
+                recognition.start();
+            } else {
+                console.error('Speech recognition not supported');
+            }
         }
-
+    
         // Function to speak text
         function speakText(text) {
-            const synth = window.speechSynthesis;
-            const utterance = new SpeechSynthesisUtterance(text);
-            synth.speak(utterance);
+            if ('speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(text);
+                synth.speak(utterance);
+            } else {
+                console.error('Speech synthesis not supported');
+            }
         }
-
+    
         // Event listener for voice input button
         document.getElementById('voiceInputBtn').addEventListener('click', () => {
             startSpeechRecognition();
         });
-
+    
         // Event listener for start interview button
         document.getElementById('startInterviewBtn').addEventListener('click', () => {
-            document.getElementById('startInterviewBtn').disabled = true; // Disable the button after clicking
+            const startInterviewBtn = document.getElementById('startInterviewBtn');
+            startInterviewBtn.disabled = true; // Disable the button after clicking
             document.getElementById('resumeForm').dispatchEvent(new Event('submit')); // Submit the form
         });
-    </script>
+    </script>      
 </body>
 </html>
