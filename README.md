@@ -26,7 +26,7 @@ To run the Mock Interview Website locally, follow these steps:
 
 - Python 3.x installed on your machine
 - Pip package manager installed
-get Gemini API from here = [https://aistudio.google.com/app/apikey]
+- get Gemini API from here = [https://aistudio.google.com/app/apikey]
 
 ### Installation
 
