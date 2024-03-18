@@ -1,5 +1,7 @@
 # Mock Interview Website
 
+https://github.com/theyashsisodiya/Intervue.ai/blob/main/Website_Preview.jpg
+
 🌟 **Project Overview**
 The Mock Interview Website is designed to provide users with a comprehensive platform to enhance their interview skills and boost their confidence. By leveraging cutting-edge technologies, the website offers a seamless and immersive experience that closely mimics real-world interview scenarios.
 
