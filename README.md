@@ -63,13 +63,6 @@ Your feedback and contributions are invaluable! If you have any suggestions, bug
 
 - **Report Issues**: Open an issue on GitHub for bug reports or feature requests.
 - **Submit Pull Requests**: Contribute enhancements or fixes to the project codebase.
-
----
-
-## 📝 License
-
-The Mock Interview Website is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute the code for your purposes.
-
 ---
 
 ### Let's Connect 🤝
