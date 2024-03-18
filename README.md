@@ -76,11 +76,11 @@ The Mock Interview Website is licensed under the [MIT License](LICENSE). Feel fr
 
 Connect with us on social media to stay updated on the latest developments and join our community of interview enthusiasts!
 
-🌐 Website: [mockinterview.com](#)
+🌐 Website: Status Pending :) we are working it to make it live ASAP.
 
-📧 Email: info@mockinterview.com
+📧 Email: [theyashsisodiya@gmail.com]()
 
-📱 Twitter: [@mockinterview](#)
+📱 Twitter: [x.com.theyashsisodiya]()
 
 ---
 
