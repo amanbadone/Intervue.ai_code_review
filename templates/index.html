@@ -1,210 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mock Interview App</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #ff7e5f, #feb47b);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
 
-        #container {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
-        }
+      #container {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        width: 400px;
+        text-align: center;
+      }
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+      }
 
-        form {
-            margin-bottom: 20px;
-        }
+      form {
+        margin-bottom: 20px;
+      }
 
-        label {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
+      label {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        display: block;
+      }
 
-        input[type="file"] {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            width: 100%;
-        }
+      input[type="file"] {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        width: 100%;
+      }
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #333;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
 
-        button:hover {
-            background-color: #555;
-        }
+      button:hover {
+        background-color: #555;
+      }
 
-        #questionArea {
-            margin-bottom: 20px;
-        }
+      #questionArea {
+        margin-bottom: 20px;
+      }
 
-        #voiceInputBtn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
-            cursor: pointer;
-            display: none;
-            transition: background-color 0.3s ease;
-        }
+      #voiceInputBtn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #333;
+        color: #fff;
+        cursor: pointer;
+        display: none;
+        transition: background-color 0.3s ease;
+      }
 
-        #voiceInputBtn:hover {
-            background-color: #555;
-        }
+      #voiceInputBtn:hover {
+        background-color: #555;
+      }
 
-        textarea {
-            display: none;
-        }
+      textarea {
+        display: none;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="container">
-        <h1>Mock Interview</h1>
-        <form id="resumeForm">
-            <label for="resume">Upload your resume:</label>
-            <input type="file" id="resume" accept=".pdf, .doc, .docx">
-            <button type="submit" id="startInterviewBtn">Start Interview</button>
-        </form>        
-        <div id="questionArea">
-            <!-- Questions and user responses will be displayed here -->
-        </div>
-        <div id="feedbackArea">
-            <!-- Feedback for the user will be displayed here -->
-        </div>
-        <button id="voiceInputBtn">Start Voice Input</button>
-        <textarea id="userResponse"></textarea>
+      <h1>Mock Interview</h1>
+      <form id="resumeForm">
+        <label for="resume">Upload your resume:</label>
+        <input type="file" id="resume" accept=".pdf, .doc, .docx" />
+        <button type="submit" id="startInterviewBtn">Start Interview</button>
+      </form>
+      <div id="questionArea">
+        <!-- Questions and user responses will be displayed here -->
+      </div>
+      <div id="feedbackArea">
+        <!-- Feedback for the user will be displayed here -->
+      </div>
+      <button id="voiceInputBtn">Start Voice Input</button>
+      <textarea id="userResponse"></textarea>
     </div>
-  <script>
-    document.getElementById('resumeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        const resumeInput = document.getElementById('resume');
-        if (!resumeInput.files[0]) {
-            console.error('No file selected');
+    <script>
+      let questions = []; // Global variable to store received questions
+
+      document
+        .getElementById("resumeForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData();
+          const resumeInput = document.getElementById("resume");
+          if (!resumeInput.files[0]) {
+            console.error("No file selected");
             return;
-        }
-        formData.append('resume', resumeInput.files[0]);
-        
-        try {
-            const response = await fetch('/parse_resume', {
-                method: 'POST',
-                body: formData
+          }
+          formData.append("resume", resumeInput.files[0]);
+          try {
+            const response = await fetch("/parse_resume", {
+              method: "POST",
+              body: formData,
             });
             const data = await response.json();
-            console.log('Response data:', data);
+            console.log("Response data:", data);
             if (data.questions && data.questions.length > 0) {
-                displayQuestion(data.questions.shift()); // Display the first question
+              questions = data.questions; // Store received questions
+              displayNextQuestion(); // Display the first question
+              document.getElementById("voiceInputBtn").style.display = "block"; // Show the voice input button
             } else {
-                console.error('No questions received from the server');
+              console.error("No questions received from the server");
+              // Handle no questions received scenario
             }
-            document.getElementById('voiceInputBtn').style.display = 'block'; // Show the voice input button
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
+          } catch (error) {
+            console.error("Error:", error);
+            // Handle error scenario
+          }
+        });
 
-    async function submitUserResponse(response) {
-        const responseDiv = document.createElement('div');
+      async function submitUserResponse(response) {
+        const responseDiv = document.createElement("div");
         responseDiv.innerHTML = `<p><strong>Your Response:</strong> ${response}</p>`;
-        document.getElementById('questionArea').appendChild(responseDiv);
+        document.getElementById("questionArea").appendChild(responseDiv);
 
-        // Send user response to backend for processing
         try {
-            const backendResponse = await fetch('/submit_response', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ response: response })
-            });
-            const responseData = await backendResponse.json();
-            console.log('Backend response data:', responseData);
-            if (responseData.question) {
-                displayQuestion(responseData.question); // Display the next question
-            } else {
-                console.log('Interview completed');
-                document.getElementById('questionArea').innerHTML = '<p><strong>Interview completed!</strong></p>';
-            }
+          const backendResponse = await fetch("/process_response", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ response: response }),
+          });
+          const responseData = await backendResponse.json();
+          console.log("Backend response data:", responseData);
+          if (responseData.question) {
+            displayNextQuestion(); // Display the next question
+          } else if (responseData.status === "completed") {
+            console.log("Interview completed");
+            document.getElementById("questionArea").innerHTML =
+              "<p><strong>Interview completed!</strong></p>";
+          } else {
+            console.error("No question received from the server");
+            // Handle no question received scenario
+          }
         } catch (error) {
-            console.error('Error:', error);
+          console.error("Error:", error);
+          // Handle error scenario
         }
-    }                
-    
-    function displayQuestion(question) {
-        const questionArea = document.getElementById('questionArea');
-        const questionHTML = `<p><strong>Question:</strong> ${question}</p>`;
-        questionArea.innerHTML += questionHTML; // Append the new question HTML
-        speakText(`Question: ${question}`); // Speak the question
-    }
+      }
 
-    // Function to start speech recognition
-    function startSpeechRecognition() {
-        if ('webkitSpeechRecognition' in window) {
-            const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.onresult = async function(event) {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('userResponse').value = transcript;
-                submitUserResponse(transcript); // Submit the response to the backend
-            };
-            recognition.start();
+      function displayNextQuestion() {
+        const questionArea = document.getElementById("questionArea");
+        if (questions.length > 0) {
+          const question = questions.shift(); // Get and remove the first question
+          const questionHTML = `<p><strong>Question:</strong> ${question}</p>`;
+          questionArea.innerHTML = questionHTML; // Display the question
+          speakText(`Question: ${question}`); // Speak the question
         } else {
-            console.error('Speech recognition not supported');
+          console.log("No more questions");
+          document.getElementById("questionArea").innerHTML =
+            "<p><strong>No more questions!</strong></p>";
         }
-    }
+      }
 
-    // Function to speak text
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            const synth = window.speechSynthesis;
-            const utterance = new SpeechSynthesisUtterance(text);
-            synth.speak(utterance);
+      function startSpeechRecognition() {
+        if ("webkitSpeechRecognition" in window) {
+          const recognition = new webkitSpeechRecognition();
+          recognition.lang = "en-US";
+          recognition.onresult = async function (event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById("userResponse").value = transcript;
+            submitUserResponse(transcript); // Submit the response to the backend
+          };
+          recognition.start();
         } else {
-            console.error('Speech synthesis not supported');
+          console.error("Speech recognition not supported");
+          // Provide alternative input method or handle according to the application's requirements
         }
-    }
+      }
 
-    // Event listener for voice input button
-    document.getElementById('voiceInputBtn').addEventListener('click', () => {
+      function speakText(text) {
+        if ("speechSynthesis" in window) {
+          const synth = window.speechSynthesis;
+          const utterance = new SpeechSynthesisUtterance(text);
+          synth.speak(utterance);
+        } else {
+          console.error("Speech synthesis not supported");
+          // Provide alternative method for conveying question to the user
+        }
+      }
+
+      document.getElementById("voiceInputBtn").addEventListener("click", () => {
         startSpeechRecognition();
-    });
+      });
 
-    // Event listener for start interview button
-    document.getElementById('startInterviewBtn').addEventListener('click', () => {
-        const startInterviewBtn = document.getElementById('startInterviewBtn');
-        startInterviewBtn.disabled = true; // Disable the button after clicking
-        document.getElementById('resumeForm').dispatchEvent(new Event('submit')); // Submit the form
-    });
-</script>
-</body>
+      document
+        .getElementById("startInterviewBtn")
+        .addEventListener("click", () => {
+          const startInterviewBtn =
+            document.getElementById("startInterviewBtn");
+          startInterviewBtn.disabled = true; // Disable the button after clicking
+          document
+            .getElementById("resumeForm")
+            .dispatchEvent(new Event("submit")); // Submit the form
+        });
+    </script>
+  </body>
 </html>

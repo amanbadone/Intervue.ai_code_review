@@ -1,0 +1,114 @@
+<script>
+        let questions = []; // Global variable to store received questions
+    
+        document.getElementById('resumeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const resumeInput = document.getElementById('resume');
+            if (!resumeInput.files[0]) {
+                console.error('No file selected');
+                return;
+            }
+            formData.append('resume', resumeInput.files[0]);
+            
+            try {
+                const response = await fetch('/parse_resume', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                console.log('Response data:', data);
+                if (data.questions && data.questions.length > 0) {
+                    questions = data.questions; // Store received questions
+                    displayNextQuestion(); // Display the first question
+                    document.getElementById('voiceInputBtn').style.display = 'block'; // Show the voice input button
+                } else {
+                    console.error('No questions received from the server');
+                    // Handle no questions received scenario
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error scenario
+            }
+        });
+    
+        async function submitUserResponse(response) {
+            const responseDiv = document.createElement('div');
+            responseDiv.innerHTML = `<p><strong>Your Response:</strong> ${response}</p>`;
+            document.getElementById('questionArea').appendChild(responseDiv);
+        
+            try {
+                const backendResponse = await fetch('/process_response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ response: response })
+                });
+                const responseData = await backendResponse.json();
+                console.log('Backend response data:', responseData);
+                if (responseData.question) {
+                    displayNextQuestion(); // Display the next question
+                } else if (responseData.status === 'completed') {
+                    console.log('Interview completed');
+                    document.getElementById('questionArea').innerHTML = '<p><strong>Interview completed!</strong></p>';
+                } else {
+                    console.error('No question received from the server');
+                    // Handle no question received scenario
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error scenario
+            }
+        }        
+    
+        function displayNextQuestion() {
+            const questionArea = document.getElementById('questionArea');
+            if (questions.length > 0) {
+                const question = questions.shift(); // Get and remove the first question
+                const questionHTML = `<p><strong>Question:</strong> ${question}</p>`;
+                questionArea.innerHTML = questionHTML; // Display the question
+                speakText(`Question: ${question}`); // Speak the question
+            } else {
+                console.log('No more questions');
+                document.getElementById('questionArea').innerHTML = '<p><strong>No more questions!</strong></p>';
+            }
+        }
+    
+        function startSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.onresult = async function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('userResponse').value = transcript;
+                    submitUserResponse(transcript); // Submit the response to the backend
+                };
+                recognition.start();
+            } else {
+                console.error('Speech recognition not supported');
+                // Provide alternative input method or handle according to the application's requirements
+            }
+        }
+    
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(text);
+                synth.speak(utterance);
+            } else {
+                console.error('Speech synthesis not supported');
+                // Provide alternative method for conveying question to the user
+            }
+        }
+    
+        document.getElementById('voiceInputBtn').addEventListener('click', () => {
+            startSpeechRecognition();
+        });
+    
+        document.getElementById('startInterviewBtn').addEventListener('click', () => {
+            const startInterviewBtn = document.getElementById('startInterviewBtn');
+            startInterviewBtn.disabled = true; // Disable the button after clicking
+            document.getElementById('resumeForm').dispatchEvent(new Event('submit')); // Submit the form
+        });
+    </script>

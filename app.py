@@ -2,10 +2,11 @@ from flask import Flask, request, jsonify, render_template
 from PyPDF2 import PdfReader
 import google.generativeai as genai
 
+
 app = Flask(__name__, static_folder='static')
 
 # Replace 'YOUR_API_KEY' with your actual API key
-API_KEY = 'YOUR_API_KEY'
+API_KEY = 'AIzaSyB8Td8xynfJ7QzKly1xpdg6Y_4chnBkymU'
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
@@ -50,21 +51,7 @@ def parse_resume():
         # Handle errors during resume parsing or question generation
         return jsonify({'error': str(e)}), 500
 
-@app.route('/process_response', methods=['POST'])
-def process_response():
-    global current_question
-    response_data = request.json
-    user_response = response_data.get('response', '')
-
-    # Here, you need to implement logic to handle the user's response and determine the next question
-    # Example logic:
-    if current_question == "Tell me about your experience as an Android Developer Intern at Infobyte.":
-        # Logic to handle the response for this specific question
-        # You can update the current_question variable to ask a follow-up question
-        current_question = "Describe your role as Club Head of the MLSA Club."
-
-    # Return the next question or None if the interview is completed
-    return jsonify({'question': current_question})
+# Undefined Variable current_question: Ensure that current_question is defined globally or passed as an argument to the process_response function.
 
 @app.route('/start_interview', methods=['POST'])
 def start_interview():
@@ -112,5 +99,58 @@ def resume_info():
     print(resume_text)
     return jsonify({'status': 'success'})
 
+@app.route('/process_response', methods=['POST'])
+def process_response():
+    global current_question, questions
+
+    # Get the user's response from the request data
+    response_data = request.json
+    user_response = response_data.get('response', '')
+
+    # Logic to determine the next question dynamically based on the user's response and interview context
+    if current_question:
+        # Handle follow-up questions based on the user's response to the current question
+        next_question = get_next_question_based_on_response(current_question, user_response)
+    else:
+        # If there's no current question (e.g., at the beginning of the interview), get the next question from the resume
+        next_question = get_next_resume_question()
+
+    # Update the current question for the next iteration
+    current_question = next_question
+
+    # Return the next question or None if the interview is completed
+    return jsonify({'question': current_question})
+
+def get_next_question_based_on_response(current_question, user_response):
+    """
+    Determine the next question based on the user's response to the current question.
+
+    Args:
+    - current_question: The current question asked in the interview.
+    - user_response: The user's response to the current question.
+
+    Returns:
+    - The next question to ask in the interview based on the user's response.
+    """
+    # Implement your logic here
+    # Example logic:
+    if "experience as an Android Developer Intern" in current_question:
+        return "Describe your role as Club Head of the MLSA Club."
+    else:
+        return None
+
+def get_next_resume_question():
+    """
+    Get the next question from the resume.
+
+    Returns:
+    - The next question to ask in the interview based on the resume.
+    """
+    # Implement your logic here
+    # Example logic:
+    if questions:
+        return questions.pop(0)
+    else:
+        return None
 if __name__ == '__main__':
     app.run(debug=True)
