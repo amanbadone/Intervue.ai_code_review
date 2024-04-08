@@ -42,11 +42,15 @@ def parse_resume():
         questions = [question.strip() for question in generated_questions if question.strip() and not question.strip().startswith('*')]
 
         # Handle empty question list (if necessary)
+        #aman: it is a good practice and error handling by any means if the api didnt respond as expected
         if not questions:
             questions = ["Tell me about yourself.", "What are your strengths and weaknesses?"]  # Default questions
 
         interview_started = True  # Set the flag to indicate that the interview has started
-        return jsonify({'status': 'success', 'questions': questions})  # Corrected key name
+    
+        return jsonify({'status': 'success', 'questions': questions})
+        #'questions': questions part is not required as we are doing so in the below start_interview function
+      # Corrected key name
     except Exception as e:
         # Handle errors during resume parsing or question generation
         return jsonify({'error': str(e)}), 500
@@ -71,6 +75,8 @@ def end_interview():
     interview_started = False
     return jsonify({'status': 'completed'})
 
+#the below code is compeletly garbage hardcode ain't required, ain't dynamic 
+"""
 @app.route('/test_question_generation', methods=['GET'])
 def test_question_generation():
     global questions
@@ -84,12 +90,13 @@ def test_question_generation():
     # Handle empty question list (if necessary)
     if not questions:
         questions = ["Tell me about yourself.", "What are your strengths and weaknesses?"]  # Default questions
-    return jsonify({'generated_questions': questions})
-
+    return jsonify({'generated_questions': questions})"""
+#the aim is established by the start_interview() no use of rewriting it also 
+#here no error handling maintained
 @app.route('/generated_questions', methods=['GET'])
 def get_generated_questions():
     global questions
-    return jsonify({'generated_questions': questions})
+    return jsonify({'generated_questions': questions})#it should be questions.pop(0)
 
 # New route to print resume data in the terminal
 @app.route('/resume_info', methods=['GET'])
@@ -121,36 +128,41 @@ def process_response():
     # Return the next question or None if the interview is completed
     return jsonify({'question': current_question})
 
-def get_next_question_based_on_response(current_question, user_response):
-    """
-    Determine the next question based on the user's response to the current question.
+#   utterly nonsensical code again hardcoded and no element of dynamicity
+"""Not Dynamic , Not Required Does not accompolishes anything"""
 
-    Args:
-    - current_question: The current question asked in the interview.
-    - user_response: The user's response to the current question.
+# def get_next_question_based_on_response(current_question, user_response):
+#     """
+#     Determine the next question based on the user's response to the current question.
 
-    Returns:
-    - The next question to ask in the interview based on the user's response.
-    """
-    # Implement your logic here
-    # Example logic:
-    if "experience as an Android Developer Intern" in current_question:
-        return "Describe your role as Club Head of the MLSA Club."
-    else:
-        return None
+#     Args:
+#     - current_question: The current question asked in the interview.
+#     - user_response: The user's response to the current question.
 
-def get_next_resume_question():
-    """
-    Get the next question from the resume.
+#     Returns:
+#     - The next question to ask in the interview based on the user's response.
+#     """
+#     # Implement your logic here
+#     # Example logic:
+#     if "experience as an Android Developer Intern" in current_question:
+#         return "Describe your role as Club Head of the MLSA Club."
+#     else:
+#         return None
 
-    Returns:
-    - The next question to ask in the interview based on the resume.
-    """
-    # Implement your logic here
-    # Example logic:
-    if questions:
-        return questions.pop(0)
-    else:
-        return None
+"""Not Dynamic , Not Required Does not accompolishes anything"""
+
+# def get_next_resume_question():
+#     """
+#     Get the next question from the resume.
+
+#     Returns:
+#     - The next question to ask in the interview based on the resume.
+#     """
+#     # Implement your logic here
+#     # Example logic:
+#     if questions:
+#         return questions.pop(0)
+#     else:
+#         return None
 if __name__ == '__main__':
     app.run(debug=True)
